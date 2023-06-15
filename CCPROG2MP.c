@@ -2,9 +2,22 @@
 #include <string.h>
 
 
+/*
+? Needed info about the users
+* First & Last name
+* ID Number
+* Year & Program
+* Date & Time fro Reservation
+* Number of Participants
+* Room to Reserved (preferred)
+* Description of the Activity (short)
+*/
 
+typedef char string20[20];
 
 typedef struct Building{
+    struct room;
+// !idk building;
     int status;
 
 
@@ -12,11 +25,16 @@ typedef struct Building{
 
 
 /*
-    TO DOs
-    - Declare necessary variable names
+    TODO: Declare necessary variable names
 */
 void Input_Form(int IDN)
 {
+    /*
+        ? I think we can separately get some of this info
+        ? Yung full name, id number, year & program pwede 
+        ? sa pag login or sign in ng tao
+    */
+
     printf("Enter ID Number: ");
     scanf("%d\n", IDN);
 
@@ -48,17 +66,27 @@ void Add_Time_Condition()
 
     /*
         In case the activity will use more than 1.5hrs on specific days,
-        they can reserve an additional timeslot(must be consecutive timeslot)
+        they can reserve an additional time slot (must be consecutive time slot)
     */
 }
 
-void Cancel_Reservation()
+void Cancel_Reservation(struct <placeholder> *A, int n, char login)
 {
     /*
-        if cancel < Actual Date of Reservation
-
+        if Room == Reserved
+            Cancel
     */
+
+   /*
+        if(A[i].status == reserved && A[i].room# == room to be canceled)
+        {
+            status == Vacant
+        }
+
+   */
+
 }
+
 
 void Change_Room_Reservation()
 {

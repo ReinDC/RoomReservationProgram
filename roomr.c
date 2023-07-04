@@ -26,7 +26,7 @@ struct info{
 
 int inputData(struct info *A, int n)
 {
-	int i, tempID;
+	int i, tempID, dupe;
 	char choice;
 	
 	
@@ -70,7 +70,7 @@ int inputData(struct info *A, int n)
 int main()
 {
 	struct info data[MAX];
-	
+	int success = 2	;
 	
 	while(success == 2)
 	{

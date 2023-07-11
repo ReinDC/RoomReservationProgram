@@ -19,15 +19,13 @@ typedef struct Building{
     struct room;
 // !idk building;
     int status;
-
-
 }Building;
 
 
 /*
     TODO: Declare necessary variable names
 */
-void Input_Form(int IDN)
+void Input_Form(int IDN,char sFN,char sYnP, int nDnT,int nParticipants, char sRtR, char sDoA)
 {
     /*
         ? I think we can separately get some of this info
@@ -39,22 +37,22 @@ void Input_Form(int IDN)
     scanf("%d\n", IDN);
 
     printf("Enter Full Name: ");
-    scanf("%s\n", );
+    scanf("%s\n", sFN);
 
     printf("Enter Year & Program: ");
-    scanf("%s\n", );
+    scanf("%s\n", sYnP);
 
     printf("Enter Date and Time: ");
-    scanf("%d\n", );
+    scanf("%d\n", nDnT);
 
     printf("Enter Number of Participants: ");
-    scanf("%d\n", );
+    scanf("%d\n", nParticipants);
 
     printf("Enter Room to Reserve: ");
-    scanf("%s\n", );
+    scanf("%s\n", sRtR);
 
     printf("Enter Description of Activity: ");
-    scanf("%s\n", );
+    scanf("%s\n", sDoA);
 }
 
 void Add_Time_Condition()

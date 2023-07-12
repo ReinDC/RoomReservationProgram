@@ -16,9 +16,13 @@
 typedef char string20[20];
 
 typedef struct Building{
-    struct room;
-// !idk building;
-    int status;
+    string20 buildingName;
+    struct room{
+        int roomNum;
+        char Day[4];
+        int timeslot[6];
+        int status;
+    }rooms;
 }Building;
 
 

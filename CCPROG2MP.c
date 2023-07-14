@@ -12,51 +12,75 @@
 * Room to Reserved (preferred)
 * Description of the Activity (short)
 */
-
+#define MAX 9999
 typedef char string20[20];
 
-typedef struct Building{
+
+struct Building{
     string20 buildingName;
     struct room{
         int roomNum;
+        int roomType;
         char Day[4];
         int timeslot[6];
         int status;
     }rooms;
-}Building;
+};
 
 
 /*
     TODO: Declare necessary variable names
 */
-void Input_Form(int IDN,char sFN,char sYnP, int nDnT,int nParticipants, char sRtR, char sDoA)
+void Input_Form(struct building *A, int n)
 {
-    /*
-        ? I think we can separately get some of this info
-        ? Yung full name, id number, year & program pwede 
-        ? sa pag login or sign in ng tao
-    */
 
-    printf("Enter ID Number: ");
-    scanf("%d\n", IDN);
+    string20 tempfirstName, templastName, tempProgram; // Just in case they cancel whenever
+    int tempID, tempYear, successRT = 0, choiceRT;
 
-    printf("Enter Full Name: ");
-    scanf("%s\n", sFN);
+    printf("Input ID Number: ");
+    scanf("%d", tempID); 
 
-    printf("Enter Year & Program: ");
-    scanf("%s\n", sYnP);
+    printf("Input first name: ");
+    gets(tempfirstName);
 
-    printf("Enter Date and Time: ");
-    scanf("%d\n", nDnT);
+    printf("Input last name: ");
+    gets(templastName);
 
-    printf("Enter Number of Participants: ");
-    scanf("%d\n", nParticipants);
+    printf("Input year: ");
+    scanf("%d", tempYear);
 
-    printf("Enter Room to Reserve: ");
-    scanf("%s\n", sRtR);
 
-    printf("Enter Description of Activity: ");
-    scanf("%s\n", sDoA);
+
+    printf("Input prgram (CS-ST18): ");
+    gets(tempProgram);
+
+    while(successRT == 0)
+    {
+        
+        printf( "Select a room to reserve"
+                "[1] Classroom (Capacity: 30)"
+                "[2] Seminar Room (Capacity: 80)"
+                "[3] Auditorium (Capacity: 200)"
+                "[4] Training Room (Capacity: 50)"
+                "[5] Cancel reservation");
+        scanf("%d", &choiceRT);
+        
+        if(choiceRT >= 1 || choiceRT <= 4)
+        {
+            A[n].rooms.roomType = choiceRT;
+            successRT = 1;
+        }
+        
+        else if(choiceRT == 5) // We can add confirmation if we want
+        {
+            printf("Canceling the reservation...");
+            successRT = 2; 
+        }
+        else
+            printf("Invalid input, try again.");
+}
+
+
 }
 
 void Add_Time_Condition()
@@ -119,6 +143,7 @@ void Change_Room_Reservation()
 
 int main()
 {
+    struct Building building[MAX];
     Input_Form();    
 
     

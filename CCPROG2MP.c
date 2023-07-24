@@ -103,12 +103,9 @@ void Add_Time_Condition()
     */
 }
 
-void Cancel_Reservation(struct data *A, int n)
+void Cancel_Reservation(struct data info[], int n)
 {
-    /*
-        if Room == Reserved
-            Cancel
-    */
+    
 
    /*
         if(A[i].status == reserved && A[i].room# == room to be canceled)
@@ -126,6 +123,12 @@ void Change_Room_Reservation()
         if room status == 0
     */
 }
+
+void display_rooms(struct data info[])
+{
+
+}
+
 
 /*
     Program should check:
@@ -162,33 +165,23 @@ int main()
                 "[4] Exit program");
     scanf("%d", choiceMain);
 
-    if(choiceMain == 1)
+    switch(choiceMain)
     {
-        successInput = Input_Form(info, records);
-
-        if(successInput != 0)
-        {
-            records += successInput;
-        }
+        case 1:
+            successInput = Input_Form(info, records);
+            if(successInput != 0)
+                records += successInput;
+            break;
+        case 2:
+            Cancel_Reservation(info, records);
+            break;
+        case 3:
+            Change_Room_Reservation();
+            break;
+        default:
+            printf("Thank you for using our program!");
+            getch(); // Para di magexit agad
     }
-
-    else if(choiceMain == 2)
-    {
-        Cancel_Reservation(info, records);
-    }
-
-    else if(choiceMain == 3)
-    {
-        Change_Room_Reservation(building, records);
-    }
-
-    else
-    {
-        printf("Thank you for using our program!");
-        getch(); // Para di magexit agad
-    }
-
-            
 
     return 0;
 }

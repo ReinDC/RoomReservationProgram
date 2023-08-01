@@ -6,4 +6,5 @@ int campreDate(int todayM, int todayD, int todayY, int futureM, int futureD, int
 int dateValid(int dateM, int dateD, int dateY);
 int stringValid(char *string);
 int yearValid(int year);
+int dayValid(char *day);
 

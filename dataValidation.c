@@ -69,3 +69,27 @@ int yearValid(int year)
 }
 
 
+int dayValid(char *day)
+{
+
+    int i;
+    if(day[0] != '\0') // Check for empty string
+    {
+        if(day[0] >= 97 || day[0] <= 122)
+            day[0] -= 32; // Capitilazation
+
+        else
+        {
+            char words[7][4] = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
+            for(i = 0; i < 7; i++)
+            {
+                    if(strcmp(word[i], day) == 0)
+                        return 1;
+            }
+
+        }
+
+    }
+    return 0;
+}
+

@@ -43,6 +43,22 @@ struct room{
     int capacity;
 };
 
+void initializeRooms(struct Room *A, int numRooms)
+{
+    char roomNames[][10] = {"Y0101", "Y0102", "Y0103", "Y0104", "Y0105", "Y0106", "Y0101", "Y0101", "Y0101", "Y0101"};
+    char roomTypes[][20] = {"classroom", "classroom", "classroom", "classroom", "classroom", "classroom", "seminar room", "seminar room", "training room", "auditorium"};
+    int roomCapacities[] = {30, 30, 30, 30, 30, 30, 80, 80, 100, 150};
+
+    for (int i = 0; i < numRooms; i++) {
+        strcpy(rooms[i].name, roomNames[i]);
+        strcpy(rooms[i].type, roomTypes[i]);
+        rooms[i].capacity = roomCapacities[i];
+        rooms[i].status = 1;
+    }
+}
+
+
+
 
 /**************************************************************************
     Description : Function for inputting credentials and reservation
@@ -360,31 +376,60 @@ void display_rooms(struct data *A, struct room *B, int n, int ID, int d)
 
     @param : 
 ***************************************************************************/
-void admin_module()
+int adminMenu(int dateM, int dateD, int dateY, char *dayT)
 {
+    system("cls");
+    int choice;
+    do
+    {
+        printf( "\nWhat do you want to do?\t Date: %d/%d/%d \t Day: %s\n"
+                "[1] Remove a reservation\n"
+                "[2] Change a reservation\n"
+                "[3] Edit a reservation\n"
+                "[5] Complete a reservation\n"
+                "[6] Go back to main menu\n", dateM, dateD, dateY, dayT);
+        printf("Input choice: ");
+        scanf("%d", &choice);
 
+        if(choice < 1 || choice > 6)
+            printf("Invalid input. Please choose from the list.\n");
+
+    } while(choice < 1 || choice > 6);
+        
+    return choice;
+}
+
+void initializeRooms(struct Room *A, int numRooms) // Since kunti lang naman saatin 
+{
+    char roomNames[][10] = {"Y0101", "Y0102", "Y0103", "Y0104", "Y0105", "Y0106", "Y0107", "Y0108", "Y0109", "Y0110"};
+    char roomTypes[][20] = {"Classroom", "Classroom", "Classroom", "Classroom", "Classroom", "Classroom", "Seminar room", "Seminar room", "Training room", "Auditorium"};
+    int roomCapacities[] = {30, 30, 30, 30, 30, 30, 80, 80, 100, 150};
+
+    for (int i = 0; i < numRooms; i++) {
+        strcpy(rooms[i].name, roomNames[i]);
+        strcpy(rooms[i].type, roomTypes[i]);
+        rooms[i].capacity = roomCapacities[i];
+        rooms[i].status = 1;
+    }
 }
 
 int main()
 {
-    struct data info[MAX];
-    struct room andrew[MAX]; //struct room 
-    int records = 0, choiceMain, successInput;
+    // Main menu variables
+    int mainChoice, exit = 0, pCheck = 0;
+    string20 correctP = "Password", inputP;
+    struct Room rooms[10];
+    struct Reservation data[MAX];
 
-    int choice = 0;
+
+	
+    // Date and day variables
     int dateM, dateD, dateY, date, dateCheck = 0, dayCheck = 0;
     char dayT[4];
-
-
     do
     {
         printf("Enter todays date(MM/DD/YY): ");
         date = scanf("%2d/%2d/%2d", &dateM, &dateD, &dateY);
-
-        printf("Enter the day today (Mon, Tue, Wed..., Sat): ");
-        scanf("%s", dayT);
-
-        dayCheck = dayValid(dayT);
 
         if (date != 3 || getchar() != '\n')
         {
@@ -395,45 +440,94 @@ int main()
         }
         
         else
+        {
             dateCheck = dateValid(dateM, dateD, dateY);
-        
-        if(dayCheck == 0 )
-            printf("Invalid day.\n");
-            
-    } while (dateCheck != 1 && dayCheck != 1);
-    system("cls"); // Clear Screen
 
-    do{
-        printf("What would you like to do?\t\t Date: %d/%d/%d\n", dateM, dateD, dateY);
+            if(dateCheck == 0)
+            {
+                dateM = 0;
+                dateD = 0;
+                dateY = 0;
+                printf("Invalid date. Please input a proper date.\n");
+            }
+                
+        }
+            
+            
+        
+
+
+    } while(dateCheck != 1); // Date input
+
+    do {
+        printf("\nEnter the day today (Mon, Tue, Wed..., Sat): ");
+        scanf("%3s", dayT);
+
+        if (dayT[0] >= 'a' && dayT[0] <= 'z') 
+            dayT[0] = dayT[0] - 32;
+        // Consume leftover characters in the input buffer, including the newline character
+        int c;
+        while ((c = getchar()) != '\n' && c != EOF);
+
+        dayCheck = dayValid(dayT);
+
+        if (dayCheck == 0) {
+            printf("Invalid day. Input a day from Mon to Sat only. No reservations for Sun.\n");
+        }
+
+    } while (dayCheck != 1); // Day input
+    
+
+    system("cls");
+    
+    do
+    {
+        printf("\nWhat would you like to do?\t Date: %d/%d/%d \t Day: %s\n", dateM, dateD, dateY, dayT);
+
         printf( "[1] Book a reservation\n"
                 "[2] Cancel a reservation\n"
                 "[3] Change a reservation\n"
-                "[4] Admin module"
-                "[5] Exit program");
-        scanf("%d", choiceMain);
+                "[4] Admin module\n"
+                "[5] Exit program\n");
+        printf("Input choice: ");
+        scanf("%d", &mainChoice);
 
-        switch(choiceMain)
+        switch (mainChoice)
         {
-            case 1:
-                successInput = Input_Form(info, andrew,records);
-                if(successInput != 0)
-                    records += successInput;
-                break;
-            case 2:
-                Cancel_Reservation(info, andrew, records);
-                break;
-            case 3:
-                Change_Room_Reservation(info, andrew, records);
-                break;
-            case 4: //Admin Module
-                //admin_module();
-                break;
-            default:
-                printf("Thank you for using our program!");
-                getch(); // Para di magexit agad
-        }
-    } while(choiceMain != 5);
+        case 1:
+            printf("You chose 1");
+            break;
+        case 2:
+            printf("You chose 2");
+            break;
+        case 3:
+            printf("You chose 3");
+            break;
+        case 4:
+            while(pCheck != 1)
+            {
+                password(inputP);
+                if(strcmp(correctP, inputP) == 0 || inputP[0] == '\0') // Password
+                    pCheck = 1;
+                else
+                    printf("Wrong password. Please try again.");
+            }
 
+            if(pCheck == 1)
+                adminMenu(dateM, dateD, dateY, dayT);
+            
+            break;
+        case 5:
+            printf("Thank you for using our program!");
+            exit = 1;
+            break;
+        
+        default:
+            printf("Invalid input. Please choose from the given list.");
+            break;
+        }
+    } while(exit != 1);
+	
     return 0;
 }
 

@@ -16,6 +16,7 @@ persons.
 #include <windows.h>
 #include <conio.h>
 #include <stdlib.h>
+#include "dataValidation.h"
 
 /*
 ? Needed info about the users
@@ -59,7 +60,7 @@ struct room{
 /*
     TODO: Declare necessary variable names
 */
-int Input_Form(struct data *A, int n)
+int Input_Form(struct data *A, struct room *B,int n)
 {
 
     string20 tempfirstName, templastName, tempCourse, roomType; // Just in case they cancel whenever
@@ -163,9 +164,9 @@ int Input_Form(struct data *A, int n)
         strcpy(A[n].data.lastName, templastName);
         A[n].data.year = tempYear;
         strcpy(A[n].data.course, tempCourse);
-        A[n].rooms.date = tempDate;
-        strcpy(A[n].rooms.timeslot, tempTime);
-        A[n].rooms.roomType = tempRType;
+        B[n].room.date = tempDate;
+        strcpy(A[n].room.timeslot, tempTime);
+        B[n].room.roomType = tempRType;
         strcpy(A[n].roomDesc, tempDesc);
         
     }
@@ -262,8 +263,8 @@ int Cancel_Reservation(struct data *A, int n)
 			strcpy(A[i].data.lastName, A[i+1].data.lastName);
 			A[i].data.year = A[i+1].data.year;
 			strcpy(A[i].data.course, A[i+1].data.course);
-            A[i].rooms.roomNum =  A[i+1].rooms.roomNum;
-            A[i].rooms.roomType =  A[i+1].rooms.roomType;
+            B[i].roomNum =  B[i+1].room.roomNum;
+            B[i].roomType =  B[i+1].room.roomType;
 		}
 	}
 }
@@ -275,7 +276,7 @@ void Change_Room_Reservation()
     */
 }
 
-void display_rooms(struct data *A, int n, int ID, int d)
+void display_rooms(struct data *A, struct room *B, int n, int ID, int d)
 {
     int i, j = 1;
     string20 stat;
@@ -287,7 +288,7 @@ void display_rooms(struct data *A, int n, int ID, int d)
 	{
 		if(ID == A[i].data.ID)
 		{
-            if(A[i].rooms.status == 0)
+            if(B[i].status == 0)
                 strcpy(stat,"Available");
             else
                 strcpy(stat,"Unavailable");
@@ -327,10 +328,30 @@ void display_rooms(struct data *A, int n, int ID, int d)
 int main()
 {
     struct data info[MAX];
-    int records = 0, choiceMain, successInput, date;
+    struct room andrew[MAX]; //struct room 
+    int records = 0, choiceMain, successInput;
 
-    printf("Input date: (MMDDYY)");
-    scanf("%d", date);
+    int choice = 0;
+    int dateM, dateD, dateY, date, dateCheck;
+
+
+    do
+    {
+        dateCheck = 0;
+        printf("Enter todays date(MM/DD/YY): ");
+        date = scanf("%2d/%2d/%2d", &dateM, &dateD, &dateY);
+
+        if (date != 3 || getchar() != '\n')
+        {
+            printf("Invalid date format. Please enter the date in MM/DD/YY format.\n");
+            dateM = 0;
+            dateD = 0;
+            dateY = 0;
+        }
+        
+        else
+            dateCheck = dateValid(dateM, dateD, dateY);
+    } while (dateCheck != 1);
     
     system("cls");
 
@@ -345,7 +366,7 @@ int main()
     switch(choiceMain)
     {
         case 1:
-            successInput = Input_Form(info, records);
+            successInput = Input_Form(info, andrew,records);
             if(successInput != 0)
                 records += successInput;
             break;

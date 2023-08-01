@@ -34,7 +34,6 @@ typedef char string1000[1001];
 
 
 struct data{
-    string20 buildingName;
     struct person{
         int ID;
         string20 firstName;
@@ -43,17 +42,18 @@ struct data{
         string20 course;
         int max_reserve;
     }data;
-    struct room{
-        int roomNum;
-        int roomType;
-        string20 Day;
-        int date; // (MMDDYY)
-        string20 timeslot;
-        int status;
-        int capacity;
-    }rooms;
     string1000 roomDesc;
+    string20 Day;
 };
+
+struct room{
+    int roomNum;
+    int roomType;
+    int date; // (MMDDYY)
+    string20 timeslot;
+    int status;
+    int capacity;
+}rooms;
 
 
 /*
@@ -66,6 +66,8 @@ int Input_Form(struct data *A, int n)
     string1000 tempDesc;
     
     int tempID, tempYear, tempDate, successRT = 0, choiceRT, tempRType, successInput = 0, choiceReserve;
+    int monthCurrent, dateCurrent, yearCurrent; //Current date
+    int tempMonth, tempDate, tempYear;
 
     printf("Input ID Number: ");
     scanf("%d",tempID); 
@@ -82,8 +84,23 @@ int Input_Form(struct data *A, int n)
     printf("Input prgram (CS-ST18): ");
     gets(tempCourse);
     
-    printf("Inpute date of reservation: (MMDDYY)");
-    scanf("%d", tempDate);
+    printf("Enter current date (DD/MM/YYYY): "); // 07/27/23
+    scanf("%d/%d/%d",&monthCurrent,&dateCurrent,&yearCurrent);
+        
+    printf("Enter date of reservation (DD/MM/YYYY): ");
+    scanf("%d/%d/%d",&tempMonth,&tempDate,&tempYear);
+
+    if((monthCurrent >= 1 && monthCurrent <= 12 && dateCurrent >= 1 && dateCurrent <= 31) && (tempMonth >= 1 && tempMonth <= 12 && tempDate >= 1 && tempDate <= 31)) // Check if input is valid
+        {
+            if(yearCurrent < tempYear || (monthCurrent < tempMonth && yearCurrent < tempYear) || (monthCurrent < tempMonth && dateCurrent < tempDate && yearCurrent < tempYear))// Check if the date the user input is valid
+                printf("Valid date");		
+            
+            else
+                printf("Invalid date");
+        }
+        
+        else
+                printf("Invalid input");
 
     while(successRT == 0)
     {
@@ -254,7 +271,7 @@ int Cancel_Reservation(struct data *A, int n)
 void Change_Room_Reservation()
 {
     /*
-        if room status == 0
+        A bit like Cancel Reservation but just editing status and ownership.
     */
 }
 

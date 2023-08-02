@@ -17,30 +17,26 @@ persons.
 #include <stdlib.h>
 #include "dataValidation.h"
 
-#define MAX 9999
-typedef char string20[21];
-typedef char string1000[1001];
 
-struct data{
-    struct person{
-        int ID;
-        string20 firstName;
-        string20 lastName;
-        int year;
-        string20 course;
-        int max_reserve;
-    }data;
-    string1000 roomDesc;
-    string20 Day;
+
+struct Reservation{
+    int userID;   // User ID number
+    string50 fullName; // User's full name
+    string50 yearProgram; // Year and program of the user
+    int dateM; // Reservation date 
+    int dateD; // Reservation date
+    int dateY; // Reservation date
+    string50 timeSlot; // Time slot for the reservation
+    int numParticipants; // Number of participants for the reservation
+    string20 roomName; // Room name reserved
+    string1000 activityDesc; // Description of the activity
 };
 
-struct room{
-    int roomNum;
-    int roomType;
-    int date; 
-    string20 timeslot;
-    int status;
-    int capacity;
+struct Room{
+    string20 name; // A0607
+    string20 type; // Room type
+    int capacity;  // Room capacity
+    int status; // Availability status (1 if available, 0 if booked)
 };
 
 void initializeRooms(struct Room *A, int numRooms)
@@ -66,128 +62,342 @@ void initializeRooms(struct Room *A, int numRooms)
     @param :  struct data *A, struct room *B,int n
     @return :  successInput
 ***************************************************************************/
-int Input_Form(struct data *A, struct room *B,int n)//STATUS: 
+int Input_form(struct Reservation *A, int records, struct Room *B, char *dayT, int dateM, int dateD, int dateY)
 {
+    char MTHF[][16] = {"09:15 - 10:45", "11:00 - 12:30", "12:45 - 14:15", "14:30 - 16:00", "16:15 - 17:45", "18:00 - 19:00"};
+    char WS[][16] = {"09:00 - 12:00", "13:00 - 16:00", "16:15 - 19:15"};
+    int timeC, i, day = 0, check = 0, choice, cant, dateCheck, mAllow = 0, index;
+    int TdateM, TdateD, TdateY, TuserID, TnumP;
+    char TroomN[10];
 
-    string20 tempfirstName, templastName, tempCourse, roomType; // Just in case they cancel whenever
-    string1000 tempDesc;
-    
-    int tempID, tempYear, tempDate, successRT = 0, choiceRT, tempRType, successInput = 0, choiceReserve;
-    int monthCurrent, dateCurrent, yearCurrent; //Current date
-    int tempMonth, tempDate, tempYear;
+    system("cls");
 
-    printf("Input ID Number: ");
-    scanf("%d",tempID); 
+    if((strcmp(dayT, "Mon") == 0) || (strcmp(dayT, "Tue") == 0) || (strcmp(dayT, "Thu") == 0) || (strcmp(dayT, "Fri") == 0))
+        day = 1;
 
-    printf("Input first name: ");
-    gets(tempfirstName);
 
-    printf("Input last name: ");
-    gets(templastName);
-
-    printf("Input year: ");
-    scanf("%d", tempYear);
-
-    printf("Input prgram (CS-ST18): ");
-    gets(tempCourse);
-    
-    printf("Enter current date (DD/MM/YYYY): "); // 07/27/23
-    scanf("%d/%d/%d",&monthCurrent,&dateCurrent,&yearCurrent);
-        
-    printf("Enter date of reservation (DD/MM/YYYY): ");
-    scanf("%d/%d/%d",&tempMonth,&tempDate,&tempYear);
-
-    if((monthCurrent >= 1 && monthCurrent <= 12 && dateCurrent >= 1 && dateCurrent <= 31) && (tempMonth >= 1 && tempMonth <= 12 && tempDate >= 1 && tempDate <= 31)) // Check if input is valid
-        {
-            if(yearCurrent < tempYear || (monthCurrent < tempMonth && yearCurrent < tempYear) || (monthCurrent < tempMonth && dateCurrent < tempDate && yearCurrent < tempYear))// Check if the date the user input is valid
-                printf("Valid date");		
-            
-            else
-                printf("Invalid date");
-        }
-        
-        else
-                printf("Invalid input");
-
-    while(successRT == 0)
+    while(check != 1)
     {
-        
-        printf( "Select a room to reserve"
-                "[1] Classroom (Capacity: 30)"
-                "[2] Seminar Room (Capacity: 80)"
-                "[3] Auditorium (Capacity: 100)"
-                "[4] Training Room (Capacity: 50)");
-        scanf("%d", &choiceRT);
-        
-        if(choiceRT >= 1 || choiceRT <= 4)
+        printf("\nEnter your ID number: ");
+        scanf("%d", &TuserID);
+
+        if(TuserID < 10000000 || TuserID >= 20000000)
+            printf("Invalid input. Please try again.\n");
+
+        else if(TuserID > 10000000 && TuserID < 20000000)
         {
-           tempRType = choiceRT;
-           switch (choiceRT)
-           {
+            A[records].userID = TuserID;
+            check = 1;
+        }
+    }
+    
+
+    printf("Enter your full name (First and Last Name): ");
+    fgets(A[records].fullName, sizeof(A[records].fullName), stdin);
+
+    int len = strlen(A[records].fullName);
+    if (len > 0 && A[records].fullName[len - 1] == '\n')
+        A[records].fullName[len - 1] = '\0';
+
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF);
+
+    printf("Enter your year and program: ");
+    fgets(A[records].yearProgram, sizeof(A[records].yearProgram), stdin);
+    
+    len = strlen(A[records].yearProgram);
+    if (len > 0 && A[records].yearProgram[len - 1] == '\n')
+        A[records].yearProgram[len - 1] = '\0';
+
+    check = 0;
+    while (check != 1)
+    {
+        printf("Enter the date for the reservation (MM/DD/YY): ");
+        int date = scanf("%d/%d/%d", &TdateM, &TdateD, &TdateY);
+
+        if (date != 3 || getchar() != '\n')
+        {
+            TdateM = 0;
+            TdateD = 0;
+            TdateY = 0;
+            printf("Invalid date format. Please enter the date in MM/DD/YY format.\n");
+        }
+
+        else
+        {
+            dateCheck = dateValid(TdateM, TdateD, TdateY);
+            
+            if(dateCheck == 0)
+            {
+                TdateM = 0;
+                TdateD = 0;
+                TdateY = 0;
+                printf("Invalid date. Please enter a valid date.\n");
+            }
+            else
+            {
+                int dateCCheck = compareDate(dateM, dateD, dateY, TdateM, TdateD, TdateY);
+
+                if(dateCCheck == 1)
+                {
+                    A[records].dateD = TdateD;
+                    A[records].dateM = TdateM;
+                    A[records].dateY = TdateY;
+                    check = 1;
+                }
+
+                else
+                {
+                    TdateM = 0;
+                    TdateD = 0;
+                    TdateY = 0;
+                    printf("Invalid date. Please enter a future date.\n");
+                }
+            }
+                
+        }
+    }
+
+    check = 0;
+    while(check != 1)
+    {
+        printf("Choose a time slot\n");
+        if(day == 1)
+        {
+            for(i = 0; i < 6; i++)
+            {
+                printf("[%d] %s\n", i+1, MTHF[i]);
+            }
+        }
+
+        else
+        {
+            for(i = 0; i < 3; i++)
+            {
+                printf("[%d] %s\n", i+1, WS[i]);
+            }
+        }
+
+        printf("Enter the time slot for the reservation: ");
+        scanf("%d", &timeC);
+
+        if((timeC < 1 || timeC > 6) && day == 1)
+            printf("Invalid input. Please choose from the list.\n");
+        else if((timeC < 1 || timeC > 3) && day == 0)
+            printf("Invalid input. Please choose from the list.\n");
+        else
+            check = 1;
+    }
+
+    check = 0;
+    choice = 0;
+    cant = 0;
+    while(check != 1)
+    {
+        printf( "Would your activity last for more than 1.5 hours?\n"
+                "[1] Yes\n"
+                "[2] No\n");
+        printf("Choice: ");
+        scanf("%d", &choice);
+
+        if(choice == 1 && day == 1) // MTHF slots, act > 1.5 hours
+        {
+            for (i = 0; i < records; i++)
+            {
+                if(strcmp(A[i].timeSlot, MTHF[timeC]) == 0 && day == 1 && (A[records].dateM == A[i].dateM && A[records].dateD == A[i].dateM && A[records].dateY == A[i].dateY))
+                    cant = 1; // if the next time slot is not available
+                else
+                    cant = 0;
+            }
+        }
+
+        
+        else if(choice == 1 && day != 1)// WS slots, act > 1.5 hours
+        {
+            for (i = 0; i < records; i++)
+            {
+                if(strcmp(A[i].timeSlot, WS[timeC - 1]) == 0 && day == 1 && (A[records].dateM == A[i].dateM && A[records].dateD == A[i].dateM && A[records].dateY == A[i].dateY))
+                    cant = 1; // if the next time slot is not available
+                else
+                    cant = 0;
+            }
+        }
+
+        else
+            cant = 1;
+
+
+        switch(choice)
+        {
             case 1:
-                strcpy(roomType, "Classroom");
+                if(cant == 0)
+                {
+                    
+                    if(day == 1)
+                    {
+                        if(timeC == 6)
+                        {
+                            printf("Last available time slot chosen. Can't reserve the next time slot.\n");
+                            strcpy(A[records].timeSlot, MTHF[timeC-1]);
+                        }
+                            
+                        else
+                        {
+                            printf("Reserving the next time slot.\n");
+                            strcpy(A[records].timeSlot, MTHF[timeC-1]);
+                            strcat(A[records].timeSlot, " & ");
+                            strcat(A[records].timeSlot, MTHF[timeC]);
+                        }
+                    }
+
+                    else
+                    {
+                        if(timeC == 3) // If the chose the last time slot
+                        {
+                            printf("Last available time slot chosen. Can't reserve the next time slot.\n");
+                            strcpy(A[records].timeSlot, WS[timeC-1]);
+                        }
+                            
+                        else
+                        {
+                            printf("Reserving the next time slot.\n");
+                            strcpy(A[records].timeSlot, WS[timeC-1]);
+                            strcat(A[records].timeSlot, " & ");
+                            strcat(A[records].timeSlot, WS[timeC]);
+                        }
+                    }
+                    check = 1;
+                }
+
+                else
+                {
+                    printf("Can't reserve the next time slot. Reserving just the chosen time slot");
+                    if(day == 1)
+                        strcpy(A[records].timeSlot, MTHF[timeC-1]);
+
+                    else
+                        strcpy(A[records].timeSlot, WS[timeC-1]);
+
+                }
                 break;
 
             case 2:
-                strcpy(roomType, "Seminar Room");
+                if(day == 1)
+                    strcpy(A[records].timeSlot, MTHF[timeC-1]);
+
+                else
+                    strcpy(A[records].timeSlot, WS[timeC-1]);
+
+                check = 1;
                 break;
                 
-            case 3:
-                strcpy(roomType, "Auditorium");
+            default:
+                printf("Invalid input.\n");
                 break;
+        }
+    }
 
-            case 4:
-                strcpy(roomType, "Training Room");
-                break;
-           
-           }
+    
+
+    check = 0;
+    while(check != 1)
+    {
+        printf("Enter the number of participants: ");
+        scanf("%d", &TnumP);
+
+        if(TnumP > 150)
+            printf("Capacity has reached our limit for all of our rooms! Please lessen the participants.\n");
+        else
+        {
+            if(TnumP > 30)
+                mAllow = 7;
+            else if(TnumP > 80)
+                mAllow = 9;
+            else if(TnumP > 100)
+                mAllow = 10;
+            A[records].numParticipants = TnumP;
+            check = 1;
         }
 
-        else
-            printf("Invalid input, try again.");
+
     }
 
-    printf("Short description for the activity: ");
-    gets(tempDesc);
-
-    printf("Are you sure you want to reserve?\t Date: %d");
-    printf( "ID: %d\n"
-            "Name: %s %s\n"
-            "Year & Course: %d & %s\n"
-            "Date: %d\n" 
-            "Time: %s\n"
-            "Room Type: %s\n"
-            "Description: %s\n", tempID, tempfirstName, templastName, tempYear, tempCourse, tempDate, tempTime, roomType, tempDesc);
-    printf( "[1] Reserve the room"
-            "[2] Cancel the reservation");
-    scanf("%d", choiceReserve);
-    
-    if(choiceReserve == 1)
+    choice = 0;
+    check = 0;
+    while(check != 1)
     {
-        successInput = 1;
-        A[n].data.ID = tempID;
-        strcpy(A[n].data.firstName, tempfirstName);
-        strcpy(A[n].data.lastName, templastName);
-        A[n].data.year = tempYear;
-        strcpy(A[n].data.course, tempCourse);
-        B[n].date = tempDate;
-        strcpy(B[n].timeslot, tempTime);
-        B[n].roomType = tempRType;
-        strcpy(A[n].roomDesc, tempDesc);
+    
+        printf("Enter the room name to reserve (Y0101 - Y0110): ");
+        scanf("%s", TroomN);
+
+        if (strlen(TroomN) != 5 || TroomN[0] != 'Y' || TroomN[1] != '0' || TroomN[2] != '1' || TroomN[3] >= '0' || TroomN[3] <= '1'
+            || TroomN[4] >= '1' || TroomN[4] >= '9')
+            printf("Invalid room name. Please choose between Y0101 - Y0110\n");
         
+        int roomNumber = atoi(&TroomN[1]);
+
+        if (roomNumber >= 101 && roomNumber <= 110) // Valid room name
+        {
+            if(mAllow == 0)
+            {
+                for(i = 0; i < records; i++)
+                {
+                    if(strcmp(A[i].roomName, TroomN) == 0 && (A[i].dateD == A[records].dateD && A[i].dateY == A[records].dateY && 
+                        A[i].dateM == A[records].dateM) && (strcmp(A[i].timeSlot, A[records].timeSlot)))
+                        index = 1;
+                }
+                if(index == 1)
+                    printf("Room already reserved. Please try again.");
+                else
+                {
+                    strcpy(A[records].roomName, TroomN);
+                    printf("Room %s is reserved to your name.", A[records].roomName);
+                    check = 1;
+                }
+            }
+
+            else if(mAllow == 7)
+            {
+                for(i = 0; i < records; i++)
+                {
+                    if(strcmp(A[i].roomName, TroomN) == 0 && (A[i].dateD == A[records].dateD && A[i].dateY == A[records].dateY && 
+                        A[i].dateM == A[records].dateM) && (strcmp(A[i].timeSlot, A[records].timeSlot)))
+                        index = 1;
+                }
+
+                if(TroomN[4] >= '7' && index != 1)
+                {
+                    strcpy(A[records].roomName, TroomN);
+                    printf("Room %s is reserved to your name.", A[records].roomName);
+                    check = 1;
+                }
+                else
+                    printf("Room already reserved. Please try again.");
+
+            }
+
+            else if(mAllow == 9)
+            {
+                for(i = 0; i < records; i++)
+                {
+                    if(strcmp(A[i].roomName, TroomN) == 0 && (A[i].dateD == A[records].dateD && A[i].dateY == A[records].dateY && 
+                        A[i].dateM == A[records].dateM) && (strcmp(A[i].timeSlot, A[records].timeSlot)))
+                        index = 1;
+                }
+                
+                if((TroomN[4] == '9' || (TroomN[4] == '0' && TroomN[3] == '1')) && index != 1)
+                {
+                    strcpy(A[records].roomName, TroomN);
+                    printf("Room %s is reserved to your name.", A[records].roomName);
+                    check = 1;
+                }
+                else
+                    printf("Room already reserved. Please try again.");
+
+            }
+
+        }
     }
-
-    else
-    {
-        printf("Canceling the reservation...");
-        getch();
-    }
-    
-
-
-
-    return successInput; // To add to the array of structs
-}
 
 /**************************************************************************
     Description : Displays All Reservations depending on the User ID
@@ -416,20 +626,21 @@ void initializeRooms(struct Room *A, int numRooms) // Since kunti lang naman saa
 int main()
 {
     // Main menu variables
-    int mainChoice, exit = 0, pCheck = 0;
+    int mainChoice, exit = 0, pCheck = 0, records = 0;
     string20 correctP = "Password", inputP;
     struct Room rooms[10];
     struct Reservation data[MAX];
+    initializeRooms(rooms, 10);
 
 
 	
-    // Date and day variables
+     // Date and day variables
     int dateM, dateD, dateY, date, dateCheck = 0, dayCheck = 0;
     char dayT[4];
     do
     {
         printf("Enter todays date(MM/DD/YY): ");
-        date = scanf("%2d/%2d/%2d", &dateM, &dateD, &dateY);
+        date = scanf("%d/%d/%d", &dateM, &dateD, &dateY);
 
         if (date != 3 || getchar() != '\n')
         {
@@ -461,7 +672,7 @@ int main()
 
     do {
         printf("\nEnter the day today (Mon, Tue, Wed..., Sat): ");
-        scanf("%3s", dayT);
+        scanf("%s", dayT);
 
         if (dayT[0] >= 'a' && dayT[0] <= 'z') 
             dayT[0] = dayT[0] - 32;
@@ -495,7 +706,7 @@ int main()
         switch (mainChoice)
         {
         case 1:
-            printf("You chose 1");
+            records += Input_form(data, records, rooms, dayT, dateM, dateD, dateY);
             break;
         case 2:
             printf("You chose 2");
@@ -527,7 +738,9 @@ int main()
             break;
         }
     } while(exit != 1);
-	
+        
+
+
     return 0;
 }
 

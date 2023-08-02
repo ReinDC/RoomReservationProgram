@@ -9,14 +9,24 @@ persons.
 <Rein Dela Cruz> - <12206032> - <S12>  
 <Frederick Garcia> - <12206970> - <S11>  
 ******************************************************************************/
+// gcc -Wall CCPROG2MP.c -o run.exe
 
 #include <stdio.h>
-#include <string.h>
-#include <windows.h>
-#include <conio.h>
-#include <stdlib.h>
-#include "dataValidation.h"
+#include <string.h> // String things
+#include <conio.h> // getch();
+#include <stdlib.h> // system("cls")
+#include "dataValidation.c" // Validation functions
 
+/*
+? Needed info about the users
+* First & Last name
+* ID Number
+* Year & Program
+* Date & Time fro Reservation
+* Number of Participants
+* Room to Reserved (preferred)
+* Description of the Activity (short)
+*/
 
 
 struct Reservation{
@@ -39,34 +49,11 @@ struct Room{
     int status; // Availability status (1 if available, 0 if booked)
 };
 
-void initializeRooms(struct Room *A, int numRooms)
-{
-    char roomNames[][10] = {"Y0101", "Y0102", "Y0103", "Y0104", "Y0105", "Y0106", "Y0101", "Y0101", "Y0101", "Y0101"};
-    char roomTypes[][20] = {"classroom", "classroom", "classroom", "classroom", "classroom", "classroom", "seminar room", "seminar room", "training room", "auditorium"};
-    int roomCapacities[] = {30, 30, 30, 30, 30, 30, 80, 80, 100, 150};
-
-    for (int i = 0; i < numRooms; i++) {
-        strcpy(rooms[i].name, roomNames[i]);
-        strcpy(rooms[i].type, roomTypes[i]);
-        rooms[i].capacity = roomCapacities[i];
-        rooms[i].status = 1;
-    }
-}
-
-
-
-
-/**************************************************************************
-    Description : Function for inputting credentials and reservation
-
-    @param :  struct data *A, struct room *B,int n
-    @return :  successInput
-***************************************************************************/
 int Input_form(struct Reservation *A, int records, struct Room *B, char *dayT, int dateM, int dateD, int dateY)
 {
     char MTHF[][16] = {"09:15 - 10:45", "11:00 - 12:30", "12:45 - 14:15", "14:30 - 16:00", "16:15 - 17:45", "18:00 - 19:00"};
     char WS[][16] = {"09:00 - 12:00", "13:00 - 16:00", "16:15 - 19:15"};
-    int timeC, i, day = 0, check = 0, choice, cant, dateCheck, mAllow = 0, index;
+    int timeC, i, day = 0, check = 0, choice, cant, dateCheck, mAllow = 0, index, count;
     int TdateM, TdateD, TdateY, TuserID, TnumP;
     char TroomN[10];
 
@@ -86,8 +73,17 @@ int Input_form(struct Reservation *A, int records, struct Room *B, char *dayT, i
 
         else if(TuserID > 10000000 && TuserID < 20000000)
         {
-            A[records].userID = TuserID;
-            check = 1;
+            count = countReserve(A, records, TuserID);
+            if(count > 3)
+            {
+                A[records].userID = TuserID;
+                check = 1;
+            }
+            else
+            {
+                printf("Cant have more than 3 reservations! Returning to main menu.");
+                return 0;
+            }
         }
     }
     
@@ -398,72 +394,78 @@ int Input_form(struct Reservation *A, int records, struct Room *B, char *dayT, i
 
         }
     }
+    
 
-/**************************************************************************
-    Description : Displays All Reservations depending on the User ID
 
-    @param :  struct data *A,struct room *B, int ID, int n, int d
-***************************************************************************/
-void display_Reservations(struct data *A,struct room *B, int ID, int n, int d)//Status: INCOMPLETE
-{
-	int i, j = 1;
+    printf("Enter the description of the activity: ");
+    scanf("%s", A[records].activityDesc);
 
-	printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
-	printf("Reservation/s for: %s %s\n", A[d].data.firstName, A[d].data.lastName);
 
-	for(i = 0; i < n; i++)
-	{
-		if(ID == A[i].data.ID)
-			{
-				printf(	"[%d] Timeslot: %s\n"
-						"     Date and day: %s %c\n"
-						"     Room: %s\n"
-						"     Building: Br. Andrew Gonzalez Hall\n", j, B[i].timeslot, B[i].date, A[i].Day, B[i].roomNum); 
-				j++;
-			}
-	}
-	printf("[~] Cancel");
-	printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+    printf("Review of your reservation: ");
+    printf("ID: %d", A[records].userID);
+    printf("Name: %s", A[records].fullName);
+    printf("Year & Program: %s", A[records].yearProgram);
+    printf("Date: %d/%d/%d", A[records].dateM, A[records].dateD, A[records].dateY);
+    printf("Time slot: %s", A[records].timeSlot);
+    printf("Number of participants: %d", A[records].numParticipants);
+    printf("Room: %s", A[records].roomName);
+    printf("Description of the activity: %s", A[records].activityDesc);
+    
+
+
+    return 1;
 }
 
-/**************************************************************************
-    Description : Reserving another time slot 
-
-    @param :  struct room *B
-***************************************************************************/
-void Add_Time_Condition(struct room *B)// Status: INCOMPLETE
+void initializeRooms(struct Room *A, int numRooms) // Since kunti lang naman saatin 
 {
-    int num_choice;
-    struct data s; //temp
-    //display_rooms(struct data info[]);
+    char roomNames[][10] = {"Y0101", "Y0102", "Y0103", "Y0104", "Y0105", "Y0106", "Y0107", "Y0108", "Y0109", "Y0110"};
+    char roomTypes[][20] = {"classroom", "classroom", "classroom", "classroom", "classroom", "classroom", "Seminar room", "Seminar room", "Training room", "Auditorium"};
+    int roomCapacities[] = {30, 30, 30, 30, 30, 30, 80, 80, 100, 150};
 
-    printf("Select Vacant Time slot (MTHF: 1-6) (WS: 1-3)");
-    scanf("%d", num_choice);
-    
-    if(B[num_choice].status == 0)
-    {
-        
-        B[num_choice].status = 1;
+    for (int i = 0; i < numRooms; i++) {
+        strcpy(A[i].name, roomNames[i]);
+        strcpy(A[i].type, roomTypes[i]);
+        A[i].capacity = roomCapacities[i];
+        A[i].status = 1;
     }
-    else if(B[num_choice].status == 1)
-        printf("This Time Slot is Currently unavailable");
-
-    
-    /*
-        In case the activity will use more than 1.5hrs on specific days,
-        they can reserve an additional time slot (must be consecutive time slot)
-    */
 }
 
-/**************************************************************************
-    Description : Cancelling Reservation
 
-    @param :  struct data *A,struct room *B, int n
-    @return : successRemove
-***************************************************************************/
-int Cancel_Reservation(struct data *A,struct room *B, int n)//Status: INCOMPLETE
+int displayReservations(struct Reservation *A, int records, int userID)
 {
-	int successRemove = 0, i, j, ID, arrT[2], choiceR;
+    int found = 0;
+
+    for (int i = 0; i < records; i++) {
+        if (A[i].userID == userID) {
+            if (found != 1) {
+                printf("Reservations for UserID %d:\n", userID);
+                found = 1;
+            }
+
+            printf("Reservation %d:\n", i + 1);
+            printf("User ID: %d\n", A[i].userID);
+            printf("Full Name: %s\n", A[i].fullName);
+            printf("Year & Program: %s\n", A[i].yearProgram);
+            printf("Date: %d/%d/%d\n", A[i].dateM, A[i].dateD, A[i].dateY);
+            printf("Time Slot: %s\n", A[i].timeSlot);
+            printf("Number of Participants: %d\n", A[i].numParticipants);
+            printf("Room Name: %s\n", A[i].roomName);
+            printf("Activity Description: %s\n", A[i].activityDesc);
+            printf("\n");
+        }
+    }
+
+    if (found != 1) {
+        printf("No reservations found for UserID %d.\n", userID);
+    }
+
+    return found;
+}
+
+
+int Cancel_Reservation(struct Reservation *A, int records)
+{
+	int i, j, ID, arrT[2], choiceR, check, cCheck = 0, success = 0;
 
 
 	printf("Input ID: ");
@@ -471,121 +473,111 @@ int Cancel_Reservation(struct data *A,struct room *B, int n)//Status: INCOMPLETE
 
 	j = 0;
 
-	for(i = 0; i < n; i++)
+	for(i = 0; i < records; i++)
 	{
-		if(ID == A[i].data.ID)
+		if(ID == A[i].userID)
 		{
 			arrT[j] = i;
 			j++;
 		}
 	}
 
+    check = displayReservations(A, records, ID);
 
-	display_Reservations(A,B, ID, n, arrT[0]);
-    
-	printf("Select a reservation to cancel: ");
-	scanf("%d", &choiceR);
+    if(check == 1)
+    {
+        while(cCheck != 1)
+        {
+            printf("Select a reservation to cancel (4 to exit): ");
+            scanf("%d", &choiceR);
 
-	if(choiceR >= 1 || choiceR <= 3)
-	{
-		for(i = arrT[choiceR - 1]; i < n; i++)
-		{
-			A[i].data.ID = A[i+1].data.ID;
-			strcpy(A[i].data.firstName, A[i+1].data.firstName);
-			strcpy(A[i].data.lastName, A[i+1].data.lastName);
-			A[i].data.year = A[i+1].data.year;
-			strcpy(A[i].data.course, A[i+1].data.course);
-            B[i].roomNum =  B[i+1].roomNum;
-            B[i].roomType =  B[i+1].roomType;
-		}
-	}
+            if(choiceR >= 1 || choiceR <= 3)
+            {
+                printf("Reservation #%d canceled", choiceR);
+                for(i = arrT[choiceR - 1]; i < records - 1; i++)
+                    A[i] = A[i + 1];
+                success = 1;
+            }
+
+            else if(choiceR == 4)
+            {
+                printf("Going back to the main menu");
+                cCheck = 1;
+            }
+
+            else
+                printf("Invalid Input. Please choose from the list.");
+        }
+    }
+
+    else
+        printf("No reservations. Going back to the main menu.");
+	
+
+    return success;
 }
 
-/**************************************************************************
-    Description : Changing existing timeslot Reservation
+int countReserve(Reservation *A, int records, int userID) {
+    int count = 0;
 
-    @param :  struct data *A, struct room *B, int n
-***************************************************************************/
-void Change_Room_Reservation(struct data *A, struct room *B, int n)//Status: UNSURE
+    for (int i = 0; i < records; i++) {
+        if (A[i].userID == userID) {
+            count++;
+        }
+    }
+
+    return count;
+}
+
+void change_Reservation(struct Reservation *A, int records)
 {
-    int successRemove = 0, i, j, ID, arrT[2], choiceR;
+    int i, j, ID, arrT[2], choiceR, check, cCheck = 0, success = 0;
 
-    printf("Input ID: ");
+
+	printf("Input ID: ");
 	scanf("%d", &ID);
 
 	j = 0;
 
-	for(i = 0; i < n; i++)
+	for(i = 0; i < records; i++)
 	{
-		if(ID == A[i].data.ID)
+		if(ID == A[i].userID)
 		{
 			arrT[j] = i;
 			j++;
 		}
 	}
 
+    check = displayReservations(A, records, ID);
 
-	display_Reservations(A,B, ID, n, arrT[0]);
-    
-	printf("Select a reservation to Change: ");
-	scanf("%d", &choiceR);
+    if(check == 1)
+    {
+        while(cCheck != 1)
+        {
+            printf("Select a reservation to cancel (4 to exit): ");
+            scanf("%d", &choiceR);
 
-	if(choiceR >= 1 || choiceR <= 3)
-	{
-		for(i = arrT[choiceR - 1]; i < n; i++)
-		{
-			A[i].data.ID = A[i+1].data.ID;
-			strcpy(A[i].data.firstName, A[i+1].data.firstName);
-			strcpy(A[i].data.lastName, A[i+1].data.lastName);
-			A[i].data.year = A[i+1].data.year;
-			strcpy(A[i].data.course, A[i+1].data.course);
-            B[i].roomNum =  B[i+1].roomNum;
-            B[i].roomType =  B[i+1].roomType;
-		}
-	}
-    /*
-        A bit like Cancel Reservation but just editing status and ownership.
-    */
-}
+            if(choiceR >= 1 || choiceR <= 3)
+            {
+                printf("Enter the new Full Name: ");
+                scanf("%s", A[arrT[choiceR - 1]].fullName);
+                
+            }
 
-/**************************************************************************
-    Description : Displaying rooms
+            else if(choiceR == 4)
+            {
+                printf("Going back to the main menu");
+                cCheck = 1;
+            }
 
-    @param :  struct data *A, struct room *B, int n, int ID, int d
-***************************************************************************/
-void display_rooms(struct data *A, struct room *B, int n, int ID, int d)
-{
-    int i, j = 1;
-    string20 stat;
-	printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
-	printf("Reservation/s for: %s %s\n", A[d].data.firstName, A[d].data.lastName);
-
-    
-	for(i = 0; i < n; i++)
-	{
-		if(ID == A[i].data.ID)
-		{
-            if(B[i].status == 0)
-                strcpy(stat,"Available");
             else
-                strcpy(stat,"Unavailable");
-
-            printf(	"[%d] Timeslot: %s\n"
-                    "     Date and day: %s %c\n"
-                    "     Room: %s\n"
-                    "     Status: %s"
-                    "     Building: Br. Andrew Gonzalez Hall\n", j, B[i].timeslot, B[i].date, A[i].Day, B[i].roomNum, stat); //undeclared variables
-            j++;
+                printf("Invalid Input. Please choose from the list.");
         }
-	}
-	printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+
+    }
+
 }
 
-/**************************************************************************
-    Description : Admin Module
-
-    @param : 
-***************************************************************************/
 int adminMenu(int dateM, int dateD, int dateY, char *dayT)
 {
     system("cls");
@@ -606,35 +598,25 @@ int adminMenu(int dateM, int dateD, int dateY, char *dayT)
 
     } while(choice < 1 || choice > 6);
         
+
+    
     return choice;
 }
 
-void initializeRooms(struct Room *A, int numRooms) // Since kunti lang naman saatin 
-{
-    char roomNames[][10] = {"Y0101", "Y0102", "Y0103", "Y0104", "Y0105", "Y0106", "Y0107", "Y0108", "Y0109", "Y0110"};
-    char roomTypes[][20] = {"Classroom", "Classroom", "Classroom", "Classroom", "Classroom", "Classroom", "Seminar room", "Seminar room", "Training room", "Auditorium"};
-    int roomCapacities[] = {30, 30, 30, 30, 30, 30, 80, 80, 100, 150};
 
-    for (int i = 0; i < numRooms; i++) {
-        strcpy(rooms[i].name, roomNames[i]);
-        strcpy(rooms[i].type, roomTypes[i]);
-        rooms[i].capacity = roomCapacities[i];
-        rooms[i].status = 1;
-    }
-}
-
-int main()
-{
+int main(){
+    
     // Main menu variables
     int mainChoice, exit = 0, pCheck = 0, records = 0;
     string20 correctP = "Password", inputP;
     struct Room rooms[10];
     struct Reservation data[MAX];
+    
+    
     initializeRooms(rooms, 10);
 
 
-	
-     // Date and day variables
+    // Date and day variables
     int dateM, dateD, dateY, date, dateCheck = 0, dayCheck = 0;
     char dayT[4];
     do
@@ -709,7 +691,7 @@ int main()
             records += Input_form(data, records, rooms, dayT, dateM, dateD, dateY);
             break;
         case 2:
-            printf("You chose 2");
+            records -= Cancel_Reservation(data, records);
             break;
         case 3:
             printf("You chose 3");
@@ -743,4 +725,3 @@ int main()
 
     return 0;
 }
-

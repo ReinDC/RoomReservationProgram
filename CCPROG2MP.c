@@ -17,18 +17,6 @@ persons.
 #include <stdlib.h> // system("cls")
 #include "dataValidation.c" // Validation functions
 
-/*
-? Needed info about the users
-* First & Last name
-* ID Number
-* Year & Program
-* Date & Time fro Reservation
-* Number of Participants
-* Room to Reserved (preferred)
-* Description of the Activity (short)
-*/
-
-
 struct Reservation{
     int userID;   // User ID number
     string50 fullName; // User's full name
@@ -49,6 +37,12 @@ struct Room{
     int status; // Availability status (1 if available, 0 if booked)
 };
 
+/**************************************************************************
+    Description : User Inputs credentials
+
+    @param : struct Reservation *A, int records, struct Room *B, char *dayT, int dateM, int dateD, int dateY 
+    @return :  1
+***************************************************************************/
 int Input_form(struct Reservation *A, int records, struct Room *B, char *dayT, int dateM, int dateD, int dateY)
 {
     char MTHF[][16] = {"09:15 - 10:45", "11:00 - 12:30", "12:45 - 14:15", "14:30 - 16:00", "16:15 - 17:45", "18:00 - 19:00"};
@@ -416,6 +410,11 @@ int Input_form(struct Reservation *A, int records, struct Room *B, char *dayT, i
     return 1;
 }
 
+/**************************************************************************
+    Description: Initializing Rooms 
+
+    @param : struct Room *A, int numRooms 
+***************************************************************************/
 void initializeRooms(struct Room *A, int numRooms) // Since kunti lang naman saatin 
 {
     char roomNames[][10] = {"Y0101", "Y0102", "Y0103", "Y0104", "Y0105", "Y0106", "Y0107", "Y0108", "Y0109", "Y0110"};
@@ -430,7 +429,12 @@ void initializeRooms(struct Room *A, int numRooms) // Since kunti lang naman saa
     }
 }
 
+/**************************************************************************
+    Description : Displays Reservations Made by the User
 
+    @param : struct Reservation *A, int records, int userID 
+    @return :  int found
+***************************************************************************/
 int displayReservations(struct Reservation *A, int records, int userID)
 {
     int found = 0;
@@ -462,11 +466,21 @@ int displayReservations(struct Reservation *A, int records, int userID)
     return found;
 }
 
+/**************************************************************************
+    Description : Cancels Reservations Made by the user
 
+    @param : struct Reservation *A, int records 
+    @return :  int success
+***************************************************************************/
 int Cancel_Reservation(struct Reservation *A, int records)
 {
 	int i, j, ID, arrT[2], choiceR, check, cCheck = 0, success = 0;
 
+    if(records == 0)
+    {
+        printf("No Records Found!");
+        return;
+    }
 
 	printf("Input ID: ");
 	scanf("%d", &ID);
@@ -517,7 +531,13 @@ int Cancel_Reservation(struct Reservation *A, int records)
     return success;
 }
 
-int countReserve(Reservation *A, int records, int userID) {
+/**************************************************************************
+    Description : Counts the amount of reservations
+
+    @param : struct Reservation *A, int records, int userID
+    @return :  int count
+***************************************************************************/
+int countReserve(struct Reservation *A, int records, int userID) {
     int count = 0;
 
     for (int i = 0; i < records; i++) {
@@ -529,10 +549,20 @@ int countReserve(Reservation *A, int records, int userID) {
     return count;
 }
 
+/**************************************************************************
+    Description : Changing the timeslot of reservation
+
+    @param : struct Reservation *A, int records
+***************************************************************************/
 void change_Reservation(struct Reservation *A, int records)
 {
     int i, j, ID, arrT[2], choiceR, check, cCheck = 0, success = 0;
-
+    
+    if(records == 0)
+    {
+        printf("No Records Found!");
+        return;
+    }
 
 	printf("Input ID: ");
 	scanf("%d", &ID);
@@ -562,6 +592,25 @@ void change_Reservation(struct Reservation *A, int records)
                 printf("Enter the new Full Name: ");
                 scanf("%s", A[arrT[choiceR - 1]].fullName);
                 
+                printf("Enter the new Year & Program: ");
+                scanf("%s", A[arrT[choiceR - 1]].yearProgram);
+
+                printf("Enter the new Date: ");
+                scanf("%d/%d/%d", &A[arrT[choiceR - 1]].dateM, &A[arrT[choiceR - 1]].dateD, &A[arrT[choiceR - 1]].dateY );
+
+                printf("Enter the new Time Slot: ");
+                scanf("%s", A[arrT[choiceR - 1]].timeSlot);
+
+                printf("Enter the new Number of Participants: ");
+                scanf("%d", &A[arrT[choiceR - 1]].numParticipants);
+
+                printf("Enter the new Room Name: ");
+                scanf("%s", A[arrT[choiceR - 1]].roomName);
+
+                printf("Enter the new Activity Description: ");
+                scanf("%s", A[arrT[choiceR - 1]].activityDesc);
+
+                cCheck = 1;
             }
 
             else if(choiceR == 4)
@@ -578,6 +627,12 @@ void change_Reservation(struct Reservation *A, int records)
 
 }
 
+/**************************************************************************
+    Description : Admin Menu
+
+    @param : int dateM, int dateD, int dateY, char *dayT
+    @return :  choice
+***************************************************************************/
 int adminMenu(int dateM, int dateD, int dateY, char *dayT)
 {
     system("cls");
@@ -602,7 +657,6 @@ int adminMenu(int dateM, int dateD, int dateY, char *dayT)
     
     return choice;
 }
-
 
 int main(){
     
@@ -694,7 +748,7 @@ int main(){
             records -= Cancel_Reservation(data, records);
             break;
         case 3:
-            printf("You chose 3");
+            change_Reservation(data, records);
             break;
         case 4:
             while(pCheck != 1)

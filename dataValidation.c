@@ -1,6 +1,12 @@
 #include "dataValidation.h"
 #include <string.h>
 
+/**************************************************************************
+    Description : Compares the Date
+
+    @param : int todayM, int todayD, int todayY, int futureM, int futureD, int futureY
+    @return :  1,0
+***************************************************************************/
 int compareDate(int todayM, int todayD, int todayY, int futureM, int futureD, int futureY)
 {
     // Compare the years
@@ -27,6 +33,12 @@ int compareDate(int todayM, int todayD, int todayY, int futureM, int futureD, in
     return 1;
 }
 
+/**************************************************************************
+    Description : Checking the validity of the inputted Date
+
+    @param : int dateM, int dateD, int dateY
+    @return :  1,0
+***************************************************************************/
 int dateValid(int dateM, int dateD, int dateY)
 {
     
@@ -51,6 +63,12 @@ int dateValid(int dateM, int dateD, int dateY)
 
 }
 
+/**************************************************************************
+    Description : Checks if the correct day inputted
+
+    @param : char *day
+    @return :  1,0
+***************************************************************************/
 int dayValid(char *day)
 {
     if((strcmp(day, "Mon") == 0) || (strcmp(day, "Tue") == 0) || (strcmp(day, "Wed") == 0) || (strcmp(day, "Thu") == 0) || (strcmp(day, "Fri") == 0) || (strcmp(day, "Sat") == 0))
@@ -59,6 +77,11 @@ int dayValid(char *day)
     return 0;
 }
 
+/**************************************************************************
+    Description : Checking of Admin Password
+
+    @param : char *password 
+***************************************************************************/
 void password(char *password)
 {
     int i = 0;
